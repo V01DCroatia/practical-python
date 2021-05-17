@@ -7,6 +7,10 @@ import sys
 from pprint import pprint
 RED = "\033[1;31m"
 RESET = "\033[0;0m"
+BLUE = "\033[1;34m"
+BOLD = "\033[;1m"
+REVERSE = "\033[;7m"
+CYAN = "\033[1;36m"
 
 def read_portfolio(filename):
     '''Computes the total cost (shares*price) of a portfolio file'''
@@ -14,6 +18,11 @@ def read_portfolio(filename):
     with open(filename, 'rt') as f:
         rows = csv.reader(f)
         headers = next(rows)
+        #select = ['name','shares','price']
+        #types = [str, int, float]
+        #indices = [headers.index(colname) for colname in select]
+        #row = next(rows)
+        #portfolio_r = [{colname: row[index] for colname, index in zip(select,indices)} for row in rows]
         for row in rows:
             record = dict(zip(headers, row))
             dictio = {
@@ -50,16 +59,27 @@ def make_report(stocks, prices):
         list.append((name,shares,price,change))
     return list
 
-headers = f'{"Name":>10s} {"Shares":>10s} {"Price":>10s} {"Change":>10s}\n' \
-          f'---------- ---------- ---------- ----------'
-portfolio = read_portfolio('Data/portfolio.csv')
-prices = read_prices('Data/prices.csv')
-report = make_report(portfolio, prices)
-print(headers)
-for r in report:
-    print("%10s %10d %10s %10.2f" % (r[0],r[1],'$'+str(r[2]), r[3]))
-cost = sum([s['shares'] * s['price'] for s in portfolio ])
-print(cost)
+def print_report(report: list):
+    sys.stdout.write(BLUE)
+    headers = f'\n{"Name":>10s} {"Shares":>10s} {"Price":>10s} {"Change":>10s}\n' \
+              f'---------- ---------- ---------- ----------'
+    print(headers)
+    sys.stdout.write(CYAN)
+    for r in report:
+        print("%10s %10d %10s %10.2f" % (r[0],r[1],'$'+str(r[2]), r[3]))
+    sys.stdout.write(RESET)
+
+
+
+def portfolio_report(dirPortfolio, dirPrices):
+    portfolio = read_portfolio(dirPortfolio)
+    prices = read_prices(dirPrices)
+    report = make_report(portfolio, prices)
+    print_report(report)
+    cost = sum([s['shares'] * s['price'] for s in portfolio ])
+    print(cost)
+
+portfolio_report('Data/portfolio2.csv', 'Data/prices.csv')
 
 # tests read_portfolio
 """ 
